@@ -1,0 +1,17 @@
+{
+  "name": "web-skdm",
+  "description": "SkDM diagramming tool, basically an EASIK ripoff based on JointJS",
+  "version": "0.1.0",
+  "moduleType": [
+    "node"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "jointjs": "joint#~0.9.5"
+  }
+}

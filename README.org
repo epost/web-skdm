@@ -1,0 +1,8 @@
+#+title:Web SkDM
+
+This is an initial stab at an [[http://www.mta.ca/~rrosebru/project/Easik/][EASIK]]-like visual modelling tool.
+
+This was sparked by my interest in categorical databases; see [[https://groups.google.com/d/topic/categoricaldata/rPFOX-yTyls/discussion][discussion on the categoricaldata mailing list]].
+
+Diagramming is powered by the wonderful [[http://jointjs.com/][JointJS]].
+
