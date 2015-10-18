@@ -6,4 +6,4 @@ This was sparked by my interest in categorical databases; see [[https://groups.g
 
 Diagramming is powered by the wonderful [[http://jointjs.com/][JointJS]].
 
-file:./screenshot-1.png
+[[./screenshot-1.png]]
