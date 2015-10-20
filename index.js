@@ -82,8 +82,8 @@ joint.shapes.skdm.Table2 = joint.shapes.basic.Generic.extend({
         var attrs = this.get('attrs');
 
         var rects = [
-            { type: 'name', text: this.getClassName() },
-            { type: 'attrs', text: this.get('attributes') },
+            { type: 'name'   , text: this.getClassName() },
+            { type: 'attrs'  , text: this.get('attributes') },
             { type: 'methods', text: this.get('methods') }
         ];
 
@@ -104,45 +104,90 @@ joint.shapes.skdm.Table2 = joint.shapes.basic.Generic.extend({
 
 });
 
+
+// parse XML ///////////////////////////////////////////////////////////////////
+
+var skdmXmlStr = sampleXMLMovies;
+var entitiesXmlPath = "entities > entity";
+var edgesXmlPath = "edges > edge";
+
+// https://developer.mozilla.org/en-US/docs/Web/Guide/Parsing_and_serializing_XML
+var parser = new DOMParser();
+var sketchXMLDOM = parser.parseFromString(skdmXmlStr, "text/xml");
+//console.log(sketchXMLDOM.documentElement.nodeName == "parsererror" ? "error while parsing" : oDOM.documentElement);
+console.log('document = ', sketchXMLDOM.documentElement);
+
+var entityNodes = sketchXMLDOM.documentElement.querySelectorAll(entitiesXmlPath);
+console.log('entityNodes = ', entityNodes);
+
+var edgeNodes = sketchXMLDOM.documentElement.querySelectorAll(edgesXmlPath);
+console.log('edgeNodes = ', edgeNodes);
+
+////////////////////////////////////////////////////////////////////////////////
+
+function toEntity(node) {
+    return { name: node.attributes['name'].nodeValue
+           , x:    node.attributes['x'].nodeValue
+           , y:    node.attributes['y'].nodeValue
+           };
+}
+
+function toPartialSkdmEntityShapeDesc(entityJSON) {
+    return { name:     entityJSON.name
+           , position: { x: entityJSON.x, y: entityJSON.y }
+           };
+}
+
+const defaultShapeAttrs = {
+    attributes: ['@foo'],
+    methods: [],
+    size: { width: 130, height: 80 }
+};
+
+const entities      = _.map(entityNodes, toEntity);
+const skdmShapesMap = _.object(_.map(entities, entity => [entity.name, new joint.shapes.skdm.Table2(_.extend(defaultShapeAttrs, toPartialSkdmEntityShapeDesc(entity)))]));
+
+////////////////////////////////////////////////////////////////////////////////
+
+function toEdge(edgeNode) {
+    return { source:  edgeNode.attributes['source'].nodeValue
+           , target:  edgeNode.attributes['target'].nodeValue
+           , type:    edgeNode.attributes['type'].nodeValue
+           , cascade: edgeNode.attributes['cascade'].nodeValue
+           };
+}
+
+// curried
+// :: Map String joint.shapes.skdm.Table2 -> Edge -> PartialLinkDesc
+function edgeToPartialSkdmEdgeShapeDesc(skdmShapesMap) {
+    return function(edge) {
+        return { source: { id: skdmShapesMap[ edge.source ].id }
+               , target: { id: skdmShapesMap[ edge.target ].id }
+               };
+    };
+}
+
+var edges = _.map(edgeNodes, _.compose(edgeToPartialSkdmEdgeShapeDesc(skdmShapesMap), toEdge));
+console.log('edges[0] = ', edges[0]);
+console.log('edges = ', edges);
+
+
+// draw graph //////////////////////////////////////////////////////////////////
+
+// attrs: { '.connection': { stroke: '#777', 'stroke-width': 2, 'stroke-dasharray': '5 2' }}
+const edgeLinks  = _.map(edges, edge => new joint.dia.Link(edge));
+const skdmShapes = _.values(skdmShapesMap);
+
 var graph = new joint.dia.Graph;
 
 var paper = new joint.dia.Paper({
     el: $('#sketch'),
-    width: 600,
-    height: 400,
+    width: 1200,
+    height: 1000,
     model: graph,
     gridSize: 1
 });
 
-var pb = new joint.shapes.skdm.Table({
-    position: { x: 250, y: 190 },
-    size: { width: 100, height: 30 },
-    attrs: { text: { text: 'PB' } }
-});
-
-var course = new joint.shapes.skdm.Table2({
-    name: 'Course',
-    attributes: ['@dept', '@credits', '@level', '@name'],
-    methods: ['$course'],
-    position: { x: 200, y: 30 },
-    size: { width: 200, height: 120 }
-});
-
-var clazz = new joint.shapes.skdm.Table2({
-    name: 'Class',
-    attributes: ['@offerNumber'],
-    methods: [],
-    position: { x: 400, y: 190 },
-    size: { width: 200, height: 80 }
-});
+graph.addCells(skdmShapes.concat(edgeLinks));
 
 
-// link styling examples: http://jointjs.com/demos/links
-var links = [
-    new joint.dia.Link({ source: { id: pb.id }   , target: { id: course.id },  attrs: { '.connection': { stroke: '#777', 'stroke-width': 2, 'stroke-dasharray': '5 2' }}}),
-    new joint.dia.Link({ source: { id: clazz.id }, target: { id: course.id } }),
-    new joint.dia.Link({ source: { id: pb.id }   , target: { id: clazz.id }
-    }),
-];
-
-graph.addCells([pb, course, clazz].concat(links));
