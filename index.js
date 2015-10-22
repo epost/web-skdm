@@ -5,18 +5,18 @@
 joint.shapes.skdm = {};
 
 // adapted from joint.shapes.uml.Class
-joint.shapes.skdm.Table2 = joint.shapes.basic.Generic.extend({
+joint.shapes.skdm.Entity = joint.shapes.basic.Generic.extend({
     markup: [
         '<g class="rotatable">',
           '<g class="scalable">',
-            '<rect class="skdm-table-name-rect"/><rect class="skdm-table-attrs-rect"/><rect class="skdm-table-methods-rect"/>',
+            '<rect class="skdm-entity-name-rect"/><rect class="skdm-entity-attrs-rect"/><rect class="skdm-entity-methods-rect"/>',
           '</g>',
-          '<text class="skdm-table-name-text"/><text class="skdm-table-attrs-text"/><text class="skdm-table-methods-text"/>',
+          '<text class="skdm-entity-name-text"/><text class="skdm-entity-attrs-text"/><text class="skdm-entity-methods-text"/>',
         '</g>'
     ].join(''),
 
     defaults: joint.util.deepSupplement({
-        type: 'skdm.Table2',
+        type: 'skdm.Entity',
         attrs: {
             'rect': { fill: 'white', stroke: '#777', 'follow-scale': true, width: 80, height: 140 },
             'text': {
@@ -30,20 +30,20 @@ joint.shapes.skdm.Table2 = joint.shapes.basic.Generic.extend({
 
             rect: { 'width': 200 },
 
-            '.skdm-table-name-rect':    { 'stroke': '#777', 'stroke-width': 1, 'fill': '#aaa' },
-            '.skdm-table-attrs-rect':   { 'stroke': '#777', 'stroke-width': 1, 'fill': '#ccc' },
-            '.skdm-table-methods-rect': { 'stroke': '#777', 'stroke-width': 1, 'fill': '#ccc' },
+            '.skdm-entity-name-rect':    { 'stroke': '#777', 'stroke-width': 1, 'fill': '#aaa' },
+            '.skdm-entity-attrs-rect':   { 'stroke': '#777', 'stroke-width': 1, 'fill': '#ccc' },
+            '.skdm-entity-methods-rect': { 'stroke': '#777', 'stroke-width': 1, 'fill': '#ccc' },
 
-            '.skdm-table-name-text': {
-                'ref': '.skdm-table-name-rect', 'ref-y': .5, 'ref-x': .5, 'text-anchor': 'middle', 'y-alignment': 'middle', 'font-weight': 'bold',
+            '.skdm-entity-name-text': {
+                'ref': '.skdm-entity-name-rect', 'ref-y': .5, 'ref-x': .5, 'text-anchor': 'middle', 'y-alignment': 'middle', 'font-weight': 'bold',
                 'fill': '#555', 'font-size': 12
             },
-            '.skdm-table-attrs-text': {
-                'ref': '.skdm-table-attrs-rect', 'ref-y': 5, 'ref-x': 5,
+            '.skdm-entity-attrs-text': {
+                'ref': '.skdm-entity-attrs-rect', 'ref-y': 5, 'ref-x': 5,
                 'fill': '#555', 'font-size': 12
             },
-            '.skdm-table-methods-text': {
-                'ref': '.skdm-table-methods-rect', 'ref-y': 5, 'ref-x': 5,
+            '.skdm-entity-methods-text': {
+                'ref': '.skdm-entity-methods-rect', 'ref-y': 5, 'ref-x': 5,
                 'fill': '#555', 'font-size': 12
             }
         }
@@ -81,9 +81,9 @@ joint.shapes.skdm.Table2 = joint.shapes.basic.Generic.extend({
             var lines = _.isArray(rect.text) ? rect.text : [rect.text];
             var rectHeight = lines.length * 20 + 20;
 
-            attrs['.skdm-table-' + rect.type + '-text'].text = lines.join('\n');
-            attrs['.skdm-table-' + rect.type + '-rect'].height = rectHeight;
-            attrs['.skdm-table-' + rect.type + '-rect'].transform = 'translate(0,' + offsetY + ')';
+            attrs['.skdm-entity-' + rect.type + '-text'].text = lines.join('\n');
+            attrs['.skdm-entity-' + rect.type + '-rect'].height = rectHeight;
+            attrs['.skdm-entity-' + rect.type + '-rect'].transform = 'translate(0,' + offsetY + ')';
 
             offsetY += rectHeight;
         });
@@ -140,7 +140,7 @@ const defaultShapeAttrs = {
 };
 
 const entities      = _.map(entityNodes, toEntity);
-const skdmShapesMap = _.object(_.map(entities, entity => [entity.name, new joint.shapes.skdm.Table2(_.extend(defaultShapeAttrs, toPartialSkdmEntityShapeDesc(entity)))]));
+const skdmShapesMap = _.object(_.map(entities, entity => [entity.name, new joint.shapes.skdm.Entity(_.extend(defaultShapeAttrs, toPartialSkdmEntityShapeDesc(entity)))]));
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -153,7 +153,7 @@ function toEdge(edgeNode) {
 }
 
 // curried
-// :: Map String joint.shapes.skdm.Table2 -> Edge -> PartialLinkDesc
+// :: Map String joint.shapes.skdm.Entity -> Edge -> PartialLinkDesc
 function edgeToPartialSkdmEdgeShapeDesc(skdmShapesMap) {
     return function(edge) {
         return { source: { id: skdmShapesMap[ edge.source ].id }
