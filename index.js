@@ -4,19 +4,6 @@
 
 joint.shapes.skdm = {};
 
-joint.shapes.skdm.Table = joint.shapes.basic.Generic.extend({
-    markup: '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>',
-
-    defaults: joint.util.deepSupplement({
-        type: 'skdm.Table',
-        attrs: {
-            'rect': { fill: '#aaa', stroke: '#777', 'follow-scale': true, width: 80, height: 40 },
-            'text': { 'font-size': 14, 'ref-x': .5, 'ref-y': .5, ref: 'rect', 'y-alignment': 'middle', 'x-alignment': 'middle' }
-        }
-    }, joint.shapes.basic.Generic.prototype.defaults)
-});
-
-
 // adapted from joint.shapes.uml.Class
 joint.shapes.skdm.Table2 = joint.shapes.basic.Generic.extend({
     markup: [
