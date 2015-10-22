@@ -125,21 +125,29 @@ console.log('edgeNodes = ', edgeNodes);
 
 ////////////////////////////////////////////////////////////////////////////////
 
+function toEntityAttribute(node) {
+    return { name: node.attributes['name'].nodeValue
+           , attributeTypeClass:  node.attributes['attributeTypeClass'].nodeValue
+           };
+}
+
 function toEntity(node) {
     return { name: node.attributes['name'].nodeValue
+           , attributes: _.map(node.children, toEntityAttribute)
            , x:    node.attributes['x'].nodeValue
            , y:    node.attributes['y'].nodeValue
            };
 }
 
-function toPartialSkdmEntityShapeDesc(entityJSON) {
-    return { name:     entityJSON.name
-           , position: { x: entityJSON.x, y: entityJSON.y }
+function toPartialSkdmEntityShapeDesc(entity) {
+    return { name:       entity.name
+           , position:   { x: entity.x, y: entity.y }
+           , attributes: _.map(entity.attributes, e => e.name)
            };
 }
 
 const defaultShapeAttrs = {
-    attributes: ['@foo'],
+    // attributes: ['@foo'],
     methods: [],
     size: { width: 130, height: 80 }
 };
